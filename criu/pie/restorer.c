@@ -1810,8 +1810,19 @@ __visible long __export_restore_task(struct task_restore_args *args)
 		goto core_restore_end;
 
 	/* Map vdso that wasn't parked */
-	if (args->can_map_vdso && (map_vdso(args, args->compatible_mode) < 0))
-		goto core_restore_end;
+	if (args->can_map_vdso) {
+		/*
+		 * The bootstrap tail at vdso_rt_parked_at was kept mapped by
+		 * __export_unmap (bootstrap_len - vdso_rt_size).  The kernel's
+		 * ARCH_MAP_VDSO uses MAP_FIXED_NOREPLACE internally, so it
+		 * will fail with -EEXIST if the parking address is still
+		 * occupied.  Unmap it first.
+		 */
+		if (args->vdso_rt_size)
+			sys_munmap((void *)args->vdso_rt_parked_at, args->vdso_rt_size);
+		if (map_vdso(args, args->compatible_mode) < 0)
+			goto core_restore_end;
+	}
 
 	vdso_update_gtod_addr(&args->vdso_maps_rt);
 
