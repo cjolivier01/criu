@@ -1,0 +1,50 @@
+Source: criu
+Section: utils
+Priority: optional
+Maintainer: CRIU team <criu@lists.linux.dev>
+Build-Depends:
+ asciidoctor,
+ debhelper-compat (= 13),
+ libaio-dev,
+ libbpf-dev,
+ libbsd-dev,
+ libcap-dev,
+ libdrm-dev,
+ libelf-dev,
+ libgnutls28-dev,
+ libnet-dev,
+ libnftables-dev,
+ libnl-3-dev,
+ libnl-route-3-dev,
+ libprotobuf-c-dev,
+ libprotobuf-dev,
+ libselinux-dev,
+ libtraceevent-dev,
+ libtracefs-dev,
+ pkg-config,
+ protobuf-c-compiler,
+ protobuf-compiler,
+ python3,
+ python3-protobuf,
+ python3-setuptools,
+ uuid-dev
+Rules-Requires-Root: no
+Standards-Version: 4.7.0
+Homepage: https://criu.org/
+Vcs-Browser: https://github.com/checkpoint-restore/criu
+Vcs-Git: https://github.com/checkpoint-restore/criu.git
+
+Package: criu
+Architecture: any
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends},
+ iproute2,
+ iptables,
+ python3,
+ python3-protobuf
+Description: checkpoint and restore in userspace utilities and libraries
+ CRIU checkpoints running applications and restores them later.
+ .
+ This package includes the criu executable, the crit image tool,
+ Python bindings, headers, manual pages, and bundled plugins.

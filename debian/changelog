@@ -1,0 +1,5 @@
+criu (4.2) unstable; urgency=medium
+
+  * Add in-repo Debian packaging support for local .deb builds.
+
+ -- CRIU team <criu@lists.linux.dev>  Mon, 27 Apr 2026 08:41:51 -0700

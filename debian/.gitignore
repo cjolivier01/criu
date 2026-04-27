@@ -1,0 +1,9 @@
+*
+!/.gitignore
+!/changelog
+!/control
+!/criu.postinst
+!/criu.prerm
+!/rules
+!/source/
+!/source/format

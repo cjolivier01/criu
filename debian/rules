@@ -1,0 +1,40 @@
+#!/usr/bin/make -f
+
+PYTHON := /usr/bin/python3
+PACKAGE := criu
+BUILD_FLAGS := PYTHON=$(PYTHON) USE_ASCIIDOCTOR=1
+INSTALL_FLAGS := $(BUILD_FLAGS) PREFIX=/usr SKIP_PIP_INSTALL=1
+SETUP_INSTALL_FLAGS := install --skip-build --no-compile --root=$(CURDIR)/debian/$(PACKAGE) --prefix=/usr --install-layout=deb --single-version-externally-managed
+PYTHON_BUILD_DIR := $(CURDIR)/debian/.python-build
+PYTHON_METADATA_DIR := $(CURDIR)/debian/.python-metadata
+
+ifeq ($(filter nodoc,$(DEB_BUILD_OPTIONS)),)
+INSTALL_TARGETS := install
+else
+INSTALL_TARGETS := install-lib install-crit install-criu install-compel install-amdgpu_plugin install-cuda_plugin
+endif
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	dh_auto_build -- $(BUILD_FLAGS)
+
+override_dh_auto_install:
+	mkdir -p $(PYTHON_BUILD_DIR)/crit $(PYTHON_BUILD_DIR)/lib
+	mkdir -p $(PYTHON_METADATA_DIR)/crit $(PYTHON_METADATA_DIR)/lib
+	$(MAKE) $(INSTALL_FLAGS) DESTDIR=$(CURDIR)/debian/$(PACKAGE) $(INSTALL_TARGETS)
+	cd lib && $(PYTHON) setup.py egg_info --egg-base $(PYTHON_METADATA_DIR)/lib build --build-base $(PYTHON_BUILD_DIR)/lib $(SETUP_INSTALL_FLAGS) --record=$(CURDIR)/debian/pycriu.install
+	cd crit && $(PYTHON) setup.py egg_info --egg-base $(PYTHON_METADATA_DIR)/crit build --build-base $(PYTHON_BUILD_DIR)/crit $(SETUP_INSTALL_FLAGS) --record=$(CURDIR)/debian/crit.install
+
+override_dh_auto_test:
+	@:
+
+override_dh_auto_clean:
+	rm -rf $(PYTHON_BUILD_DIR)
+	rm -rf $(PYTHON_METADATA_DIR)
+	rm -f debian/crit.install debian/pycriu.install
+	$(MAKE) mrproper
+
+override_dh_clean:
+	dh_clean -X__pycache__

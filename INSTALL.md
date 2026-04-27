@@ -41,6 +41,22 @@ make DESTDIR=/some/new/place install
 ```
 and get everything installed under `/some/new/place`.
 
+## Building a Debian package
+
+If you want a local `.deb` instead of a staged install tree, run:
+```
+make deb
+```
+
+This uses the packaging files in `debian/` and runs `dpkg-buildpackage -us -uc -b`.
+The resulting `.deb`, `.buildinfo`, and `.changes` files are written to the
+parent directory of the source tree.
+
+If you do not want to build the manual pages, use:
+```
+DEB_BUILD_OPTIONS=nodoc make deb
+```
+
 ## Uninstalling CRIU
 
 To clean up previously installed CRIU instance one can type

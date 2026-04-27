@@ -383,6 +383,10 @@ criu-$(tar-name).tar.bz2:
 dist tar: criu-$(tar-name).tar.bz2 ;
 .PHONY: dist tar
 
+deb:
+	dpkg-buildpackage -us -uc -b
+.PHONY: deb
+
 TAGS_FILES_REGEXP := . -name '*.[hcS]' ! -path './.*' \( ! -path './test/*' -o -path './test/zdtm/lib/*' \)
 tags:
 	$(call msg-gen, $@)
@@ -431,6 +435,7 @@ help:
 	@echo '      install         - Install CRIU (see INSTALL.md)'
 	@echo '      uninstall       - Uninstall CRIU'
 	@echo '      dist            - Create a source tarball'
+	@echo '      deb             - Build Debian binary packages'
 	@echo '      clean           - Clean most, but leave enough to navigate'
 	@echo '      mrproper        - Delete all compiled/generated files'
 	@echo '      tags            - Generate tags file (ctags)'
