@@ -2,11 +2,25 @@
 
 PYTHON := /usr/bin/python3
 PACKAGE := criu
+PIN_PACKAGE := criu-pin
 BUILD_FLAGS := PYTHON=$(PYTHON) USE_ASCIIDOCTOR=1
-INSTALL_FLAGS := $(BUILD_FLAGS) PREFIX=/usr SKIP_PIP_INSTALL=1
+DEB_HOST_MULTIARCH := $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+PACKAGE_VERSION := $(shell dpkg-parsechangelog -SVersion)
+INSTALL_FLAGS := $(BUILD_FLAGS) \
+	PREFIX=/usr \
+	BINDIR=/usr/bin \
+	SBINDIR=/usr/sbin \
+	MANDIR=/usr/share/man \
+	INCLUDEDIR=/usr/include \
+	LIBEXECDIR=/usr/libexec \
+	LIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH) \
+	PLUGINDIR=/usr/lib/criu \
+	SKIP_PIP_INSTALL=1
 SETUP_INSTALL_FLAGS := install --skip-build --no-compile --root=$(CURDIR)/debian/$(PACKAGE) --prefix=/usr --install-layout=deb --single-version-externally-managed
 PYTHON_BUILD_DIR := $(CURDIR)/debian/.python-build
 PYTHON_METADATA_DIR := $(CURDIR)/debian/.python-metadata
+PIN_DIR := $(CURDIR)/debian/$(PIN_PACKAGE)/etc/apt/preferences.d
+PIN_FILE := $(PIN_DIR)/criu-local.pref
 
 ifeq ($(filter nodoc,$(DEB_BUILD_OPTIONS)),)
 INSTALL_TARGETS := install
@@ -26,6 +40,13 @@ override_dh_auto_install:
 	$(MAKE) $(INSTALL_FLAGS) DESTDIR=$(CURDIR)/debian/$(PACKAGE) $(INSTALL_TARGETS)
 	cd lib && $(PYTHON) setup.py egg_info --egg-base $(PYTHON_METADATA_DIR)/lib build --build-base $(PYTHON_BUILD_DIR)/lib $(SETUP_INSTALL_FLAGS) --record=$(CURDIR)/debian/pycriu.install
 	cd crit && $(PYTHON) setup.py egg_info --egg-base $(PYTHON_METADATA_DIR)/crit build --build-base $(PYTHON_BUILD_DIR)/crit $(SETUP_INSTALL_FLAGS) --record=$(CURDIR)/debian/crit.install
+	mkdir -p $(PIN_DIR)
+	printf '%s\n' \
+		'# Keep the locally built CRIU selected over archive updates.' \
+		'Package: $(PACKAGE)' \
+		'Pin: version $(PACKAGE_VERSION)' \
+		'Pin-Priority: 1001' \
+		> $(PIN_FILE)
 
 override_dh_auto_test:
 	@:

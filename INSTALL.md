@@ -52,6 +52,10 @@ This uses the packaging files in `debian/` and runs `dpkg-buildpackage -us -uc -
 The resulting `.deb`, `.buildinfo`, and `.changes` files are written to the
 parent directory of the source tree.
 
+This build also produces an optional `criu-pin` package. Installing it
+alongside `criu` adds an APT preferences entry that pins CRIU to the exact
+locally built version, so routine Ubuntu upgrades do not replace it.
+
 If you do not want to build the manual pages, use:
 ```
 DEB_BUILD_OPTIONS=nodoc make deb

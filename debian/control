@@ -48,3 +48,13 @@ Description: checkpoint and restore in userspace utilities and libraries
  .
  This package includes the criu executable, the crit image tool,
  Python bindings, headers, manual pages, and bundled plugins.
+
+Package: criu-pin
+Architecture: all
+Depends:
+ ${misc:Depends},
+ criu (= ${binary:Version})
+Description: APT pin to keep this CRIU build installed
+ This package installs an APT preferences entry that pins CRIU to the
+ exact version built from this source tree, so routine Ubuntu upgrades do
+ not replace it with a newer archive build.
